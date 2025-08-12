@@ -4,7 +4,6 @@
 
 **[查看在线演示 (Live Demo)](https://liguannan-alex.github.io/The-Way-of-Creation-in-Hengdian/)** 👈 _请替换为您的 GitHub Pages 链接_
 
-![项目截图](https://placehold.co/800x450/f9f5ef/b38553?text=项目界面截图)
 
 ## ✨ 项目背景与目标
 
