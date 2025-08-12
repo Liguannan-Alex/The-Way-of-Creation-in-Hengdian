@@ -1,0 +1,448 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>横店创之道：交互式探索</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <!-- Chosen Palette: Warm Neutrals with Subtle Accents -->
+    <!-- Application Structure Plan: A thematic, single-page application design. The structure is not linear but hub-based, with a sticky top navigation for direct access to key concepts: 'Core Philosophy', 'Institutional Cornerstone', 'Twin Engines', and 'Power of Culture'. This non-linear approach allows users to explore topics based on interest rather than following the book's sequence, enhancing usability. Key interactions include clickable diagrams for the 'Five-in-One' model, a cyclical flow diagram for the 'Four Co's', and an interactive timeline for 'Cultural Power', designed to make abstract concepts tangible and memorable. -->
+    <!-- Visualization & Content Choices: 
+        - Report Info: 'Five-in-One' Social Entrepreneur Model -> Goal: Organize & Inform -> Viz/Method: Interactive Doughnut Chart (Chart.js) & clickable cards -> Interaction: Hovering on chart segments highlights details, clicking cards reveals full text -> Justification: Transforms a list into an engaging, holistic view.
+        - Report Info: 'Four Co's' Philosophy -> Goal: Show a process/cycle -> Viz/Method: Cyclical diagram (HTML/CSS) -> Interaction: Hovering over segments reveals descriptions -> Justification: Visually represents the reinforcing loop better than text.
+        - Report Info: Ownership Model Comparison -> Goal: Compare -> Viz/Method: Styled HTML Table -> Interaction: Row highlight on hover -> Justification: Clear, direct comparison of features.
+        - Report Info: Cultural Power Evolution (1.0, 2.0, 3.0) -> Goal: Show change over time -> Viz/Method: Interactive Timeline (HTML/CSS) -> Interaction: Clicking on a stage reveals its details -> Justification: Intuitively visualizes chronological progression.
+        - Report Info: Abstract Concepts (e.g., 'Water-fried Dough Sticks') -> Goal: Explain -> Viz/Method: Card-based layout -> Interaction: Click to expand -> Justification: Breaks down complex ideas into digestible, user-initiated chunks.
+    -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+    <style>
+        body {
+            font-family: 'Noto Sans SC', sans-serif;
+            background-color: #fdfaf6;
+            color: #4a4a4a;
+        }
+        .nav-link {
+            transition: color 0.3s, border-bottom-color 0.3s;
+            border-bottom: 2px solid transparent;
+        }
+        .nav-link:hover, .nav-link.active {
+            color: #c79a6b;
+            border-bottom-color: #c79a6b;
+        }
+        .card {
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        }
+        .timeline-item::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: -0.5rem;
+            transform: translateY(-50%);
+            width: 1rem;
+            height: 1rem;
+            border-radius: 9999px;
+            background-color: #e6dace;
+            border: 3px solid #fdfaf6;
+        }
+        .timeline-item.active::before {
+            background-color: #c79a6b;
+        }
+        .four-co-item {
+            transition: background-color 0.3s, color 0.3s;
+        }
+        .four-co-item:hover {
+            background-color: #c79a6b;
+            color: white;
+        }
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 450px;
+            margin-left: auto;
+            margin-right: auto;
+            height: auto;
+            max-height: 450px;
+        }
+    </style>
+</head>
+<body class="antialiased">
+
+    <header id="header" class="bg-fdfaf6/80 backdrop-blur-lg sticky top-0 z-50 shadow-sm">
+        <nav class="container mx-auto px-6 py-4 flex justify-between items-center">
+            <div class="text-2xl font-bold text-[#b38553]">横店创之道</div>
+            <div class="hidden md:flex space-x-8">
+                <a href="#philosophy" class="nav-link pb-1">核心哲学</a>
+                <a href="#institution" class="nav-link pb-1">制度基石</a>
+                <a href="#engines" class="nav-link pb-1">发展双擎</a>
+                <a href="#culture" class="nav-link pb-1">文化之力</a>
+                <a href="#lessons" class="nav-link pb-1">模式启示</a>
+            </div>
+            <button id="mobile-menu-button" class="md:hidden text-2xl">☰</button>
+        </nav>
+        <div id="mobile-menu" class="hidden md:hidden px-6 pb-4">
+            <a href="#philosophy" class="block py-2 text-center nav-link">核心哲学</a>
+            <a href="#institution" class="block py-2 text-center nav-link">制度基石</a>
+            <a href="#engines" class="block py-2 text-center nav-link">发展双擎</a>
+            <a href="#culture" class="block py-2 text-center nav-link">文化之力</a>
+            <a href="#lessons" class="block py-2 text-center nav-link">模式启示</a>
+        </div>
+    </header>
+
+    <main>
+        <section id="hero" class="py-20 bg-[#f9f5ef]">
+            <div class="container mx-auto px-6 text-center">
+                <h1 class="text-4xl md:text-6xl font-bold text-[#b38553] leading-tight">横店创之道</h1>
+                <p class="mt-4 text-lg md:text-xl text-gray-600 max-w-3xl mx-auto">
+                    探索一个贫困乡镇如何凭借独特的共生发展哲学，崛起为“中国好莱坞”的奇迹之路。
+                </p>
+                <p class="mt-2 text-sm text-gray-500">—— 对徐文荣共生发展哲学的交互式剖析</p>
+            </div>
+        </section>
+
+        <section id="philosophy" class="py-16 md:py-24">
+            <div class="container mx-auto px-6">
+                <h2 class="text-3xl font-bold text-center text-[#b38553]">核心哲学：平民思想家的“五位一体”</h2>
+                <p class="mt-4 max-w-3xl mx-auto text-center text-gray-600">
+                    横店的成功根植于其创始人徐文荣先生的个人哲学。这套哲学并非商业技巧的堆砌，而是深植于浙东文化、从实践中提炼出的一套完整的社会企业家模型。它定义了企业在新兴市场中的角色与终极责任，强调企业发展与社会贡献的统一。
+                </p>
+                <div class="mt-12 md:grid md:grid-cols-2 md:gap-12 items-center">
+                    <div class="chart-container">
+                        <canvas id="philosophyChart"></canvas>
+                    </div>
+                    <div id="philosophy-details" class="mt-8 md:mt-0">
+                        <div class="text-center p-6 bg-white rounded-lg shadow-md">
+                            <h3 class="text-xl font-semibold text-[#c79a6b]">“五位一体”社会企业家模型</h3>
+                            <p class="mt-2 text-gray-600">
+                                这是徐文荣思想的核心框架，将企业经营与社会责任融为一体，构成一个自我强化的闭环。请将鼠标悬停于左侧图表的各部分，或点击下方卡片，以探索其内涵。
+                            </p>
+                        </div>
+                    </div>
+                </div>
+                 <div id="philosophy-cards" class="mt-8 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
+                </div>
+            </div>
+        </section>
+
+        <section id="institution" class="py-16 md:py-24 bg-[#f9f5ef]">
+            <div class="container mx-auto px-6">
+                <h2 class="text-3xl font-bold text-center text-[#b38553]">制度基石：社团所有制与“四共”理念</h2>
+                <p class="mt-4 max-w-3xl mx-auto text-center text-gray-600">
+                    在私有化浪潮中，横店独创了“社团所有制”，一种资产由集体共有但不可分割到个人的新型公有制。这种制度设计是横店模式的根基，它通过“四共”理念的闭环运作，从根本上解决了企业长期发展与利益相关者协调的难题。
+                </p>
+                <div class="mt-12 flex flex-col lg:flex-row items-center justify-center gap-8">
+                    <div class="w-full lg:w-2/3">
+                        <h3 class="text-2xl font-semibold text-center mb-6 text-[#c79a6b]">“四共”理念运作流程</h3>
+                        <div class="relative w-full max-w-md mx-auto">
+                            <div class="absolute inset-0 flex items-center justify-center pointer-events-none">
+                                <div class="w-32 h-32 bg-white rounded-full shadow-inner flex items-center justify-center text-center p-2">
+                                    <span id="four-co-central-text" class="text-gray-600 font-medium">共同富裕</span>
+                                </div>
+                            </div>
+                            <div class="grid grid-cols-2 gap-4">
+                                <div data-id="cocreation" class="four-co-item p-6 rounded-lg shadow-md bg-white text-center cursor-pointer h-32 flex items-center justify-center">共创</div>
+                                <div data-id="coownership" class="four-co-item p-6 rounded-lg shadow-md bg-white text-center cursor-pointer h-32 flex items-center justify-center">共有</div>
+                                <div data-id="cosharing" class="four-co-item p-6 rounded-lg shadow-md bg-white text-center cursor-pointer h-32 flex items-center justify-center">共享</div>
+                                <div data-id="coprosperity" class="four-co-item p-6 rounded-lg shadow-md bg-white text-center cursor-pointer h-32 flex items-center justify-center">共富</div>
+                            </div>
+                        </div>
+                         <p id="four-co-details" class="mt-6 text-center text-gray-600 min-h-[6rem] p-4 bg-white rounded-lg shadow-inner">
+                            将鼠标悬停在上方模块上，查看详细解释。
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="engines" class="py-16 md:py-24">
+            <div class="container mx-auto px-6">
+                <h2 class="text-3xl font-bold text-center text-[#b38553]">发展双擎：自生与共生</h2>
+                <p class="mt-4 max-w-3xl mx-auto text-center text-gray-600">
+                    横店的持续发展由两大引擎驱动：“自生”是修炼内功，锻造企业内部核心能力；“共生”是构建和谐的外部生态，与社区、政府和社会共创价值。二者互为表里，缺一不可，共同构成了横店强大的生命力。
+                </p>
+                <div class="mt-12 grid grid-cols-1 md:grid-cols-2 gap-12">
+                    <div>
+                        <h3 class="text-2xl font-semibold text-center mb-6 text-[#c79a6b]">A. 自生引擎：锻造内部核心能力</h3>
+                        <div id="self-generation-cards" class="space-y-4"></div>
+                    </div>
+                    <div>
+                        <h3 class="text-2xl font-semibold text-center mb-6 text-[#c79a6b]">B. 共生生态：与外部世界共创价值</h3>
+                        <div id="symbiosis-cards" class="space-y-4"></div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="culture" class="py-16 md:py-24 bg-[#f9f5ef]">
+            <div class="container mx-auto px-6">
+                <h2 class="text-3xl font-bold text-center text-[#b38553]">文化之力：从硬核基建到全球品牌</h2>
+                <p class="mt-4 max-w-3xl mx-auto text-center text-gray-600">
+                    横店的“文化力”建设经历了一个从硬到软、从手段到目的的清晰演进过程。这不仅是产业转型的路径，更是一种将文化资产系统性地转化为经济驱动力的战略智慧，堪称文化驱动发展的经典案例。
+                </p>
+                <div class="mt-12 flex flex-col lg:flex-row gap-8 items-start">
+                    <div class="w-full lg:w-1/3">
+                        <div id="timeline-nav" class="flex lg:flex-col justify-around lg:justify-start lg:space-y-4 relative border-l-2 border-dashed border-[#e6dace] pl-8">
+                        </div>
+                    </div>
+                    <div id="timeline-content" class="w-full lg:w-2/3 p-8 bg-white rounded-lg shadow-lg min-h-[20rem]">
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="lessons" class="py-16 md:py-24">
+            <div class="container mx-auto px-6">
+                <h2 class="text-3xl font-bold text-center text-[#b38553]">模式启示：中国式现代化的范本</h2>
+                 <p class="mt-4 max-w-3xl mx-auto text-center text-gray-600">
+                    “横店创之道”是一个逻辑严密、内外兼修的系统。虽然其成功有独特的历史背景，但其核心原则对所有追求可持续发展的企业和地区都具有深刻的普遍价值。
+                </p>
+                <div class="mt-12 grid md:grid-cols-3 gap-8">
+                    <div class="card p-6 bg-white rounded-lg shadow-md text-center">
+                        <h3 class="text-xl font-semibold text-[#c79a6b]">学术与理论价值</h3>
+                        <p class="mt-2 text-gray-600">提供了一个非西方的、根植于本土文化的企业治理与利益相关者资本主义模型，为世界贡献了宝贵的中国案例。</p>
+                    </div>
+                    <div class="card p-6 bg-white rounded-lg shadow-md text-center">
+                        <h3 class="text-xl font-semibold text-[#c79a6b]">对可持续发展的启示</h3>
+                        <p class="mt-2 text-gray-600">证明了将社会价值融入核心战略并坚持长期主义，是构建极具韧性和盈利能力企业的有效途径，超越了“利润vs责任”的二元对立。</p>
+                    </div>
+                    <div class="card p-6 bg-white rounded-lg shadow-md text-center">
+                        <h3 class="text-xl font-semibold text-[#c79a6b]">通往共同富裕的路径</h3>
+                        <p class="mt-2 text-gray-600">提供了一个由企业主导的、可操作的微观范本，展示了企业如何成为区域发展引擎，并通过“四共”理念实现区域共同富裕。</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer class="bg-[#f9f5ef] py-8 border-t border-[#e6dace]">
+        <div class="container mx-auto px-6 text-center text-gray-500">
+            <p>基于刘正山所著《横店创之道》的交互式内容呈现。</p>
+            <p class="text-sm mt-2">此页面为学习与研究目的而创建。</p>
+        </div>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const data = {
+                philosophy: [
+                    { id: 'qiye', title: '企业强基', description: '企业家的首要责任是经营好企业。一个失败的企业不仅无法贡献社会，反而会成为社会的负担。' },
+                    { id: 'guojia', title: '国家担当', description: '企业发展必须与国家战略同频共振，通过创造就业、缴纳税收、推动乡村振兴等方式，为国分忧。' },
+                    { id: 'minsheng', title: '民生反哺', description: '以“企业办社会”为核心实践，将企业利润投入到基础设施、教育、医疗等公共服务领域，改善民生。' },
+                    { id: 'shehui', title: '社会回馈', description: '系统化地开展慈善公益和扶贫事业，将财富贡献给社会。' },
+                    { id: 'xiushen', title: '修身立范', description: '企业家的个人品行是企业文化的基石。提出的“四不贪准则”是确保整个系统不被个人私欲侵蚀的道德防线。' }
+                ],
+                fourCo: {
+                    cocreation: { title: '共创 (Co-creation)', description: '这是前提。财富是由社团全体成员通过共同奋斗创造出来的。' },
+                    coownership: { title: '共有 (Co-ownership)', description: '这是基础。既然财富是共同创造的，其所有权理应归集体共有。' },
+                    coprosperity: { title: '共富 (Co-prosperity)', description: '这是目标。共有的资产被用作发展的资本，通过创办更多企业、提供更多就业岗位，让所有人都有机会走向富裕。' },
+                    cosharing: { title: '共享 (Co-sharing)', description: '这是归宿。企业发展的最终成果，通过“企业办社会”的方式，大规模再投资于公共品，让全体成员共同分享发展的红利。' }
+                },
+                selfGeneration: [
+                    { title: '“水炸油条”：创造性优势理论', content: '意指在没有资源（油）的条件下，凭借智慧和毅力（用水），硬是把事业（油条）做出来。它挑战了经典的“比较优势”理论，强调优势不是天生的，而是通过企业家的能动性、创新和要素整合创造出来的。' },
+                    { title: '“企业养生法”：系统性管理哲学', content: '将企业比作一个生命体（人才为大脑、资金为血液、质量为心脏、科技为筋骨），通过一个直观的整体隐喻，强调企业各系统间的平衡与健康，引导企业追求长期的、坚韧的生命力。' },
+                    { title: '战略性负债经营', content: '将负债视为企业发展的战略工具而非财务负担。如同用药，用得好可以强身健体，用过量则会危及生命，体现了对平衡与风险控制的追求。' },
+                    { title: '“因时而变”：动态适应能力', content: '横店的发展史是一部不断根据外部环境调整产业重心的历史，从农业到工业，再到高科技产业和影视文旅。这体现了没有一成不变的最佳战略，只有最适应环境的战略。' }
+                ],
+                symbiosis: [
+                    { title: '“企业办社会”：战略性投资而非负担', content: '在别人剥离社会职能时，横店反其道而行之。这本质上是将外部环境的劣势（如基础设施落后）通过内部投资，转化为企业独有的竞争优势（一个配套完善的产业社区）。' },
+                    { title: '“共生治理”：新型政企关系', content: '政府与企业形成“亲”“清”的新型关系。政府负责“规划、协调、监督、服务”，不干预经营；企业则承担经济发展和部分公共治理的主体责任，实现治理效率最大化。' },
+                    { title: '产业化振兴乡村：“三农”问题的横店解法', content: '通过发展产业，将农民就地转化为工人和市民，实现了产业化和城镇化，避免了大规模人口外流，形成了一个经济、社会、人口良性循环的“内循环”发展范本。' }
+                ],
+                culture: [
+                    { id: 'c1', version: '1.0', title: '“造城”——作为生产要素的文化', description: '在发展初期，文化建设主要体现为“造城”，即投资兴建医院、学校、道路等基础设施。此时的“文化”是一种广义的文化，其核心目标是改善生产和生活环境，吸引并留住劳动力，是一种将文化投入作为解决生产要素瓶颈的“硬实力”运用。' },
+                    { id: 'c2', version: '2.0', title: '“造景”——作为核心产业的文化', description: '在解决了基本的生存发展问题后，横店开始大规模“造景”，复刻建造了秦王宫、明清宫苑等宏伟的影视拍摄基地，并以“免场租费”的颠覆性策略，吸引了全中国的影视剧组前来拍摄。此时，文化本身已成为横店的核心产品和产业平台。' },
+                    { id: 'c3', version: '3.0', title: '“造园”——作为体验经济的文化', description: '随着影视基地的建成，横店进一步将其开发为面向大众的文化主题公园，发展成为集影视拍摄、旅游观光、文化体验于一体的综合性文旅目的地。这一阶段，文化从一个产业平台，升级为一种可供大众消费的沉浸式体验产品。' }
+                ]
+            };
+
+            const mobileMenuButton = document.getElementById('mobile-menu-button');
+            const mobileMenu = document.getElementById('mobile-menu');
+            mobileMenuButton.addEventListener('click', () => {
+                mobileMenu.classList.toggle('hidden');
+            });
+
+            const navLinks = document.querySelectorAll('.nav-link');
+            const sections = document.querySelectorAll('main section');
+
+            window.addEventListener('scroll', () => {
+                let current = '';
+                sections.forEach(section => {
+                    const sectionTop = section.offsetTop;
+                    if (pageYOffset >= sectionTop - 60) {
+                        current = section.getAttribute('id');
+                    }
+                });
+
+                navLinks.forEach(link => {
+                    link.classList.remove('active');
+                    if (link.getAttribute('href').includes(current)) {
+                        link.classList.add('active');
+                    }
+                });
+            });
+            
+            navLinks.forEach(link => {
+                link.addEventListener('click', (e) => {
+                    if(window.innerWidth < 768) {
+                       mobileMenu.classList.add('hidden');
+                    }
+                });
+            });
+
+
+            const philosophyDetails = document.getElementById('philosophy-details');
+            const philosophyCardsContainer = document.getElementById('philosophy-cards');
+            data.philosophy.forEach(item => {
+                const card = document.createElement('div');
+                card.className = 'card p-4 bg-white rounded-lg shadow-md cursor-pointer';
+                card.innerHTML = `<h4 class="font-semibold text-center text-[#c79a6b]">${item.title}</h4>`;
+                card.addEventListener('click', () => {
+                    philosophyDetails.innerHTML = `
+                        <div class="text-center p-6 bg-white rounded-lg shadow-md">
+                            <h3 class="text-xl font-semibold text-[#c79a6b]">${item.title}</h3>
+                            <p class="mt-2 text-gray-600">${item.description}</p>
+                        </div>
+                    `;
+                });
+                philosophyCardsContainer.appendChild(card);
+            });
+
+            const ctx = document.getElementById('philosophyChart').getContext('2d');
+            const philosophyChart = new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: data.philosophy.map(p => p.title),
+                    datasets: [{
+                        label: '五位一体模型',
+                        data: [1, 1, 1, 1, 1],
+                        backgroundColor: [
+                            'rgba(199, 154, 107, 0.7)',
+                            'rgba(215, 178, 137, 0.7)',
+                            'rgba(230, 202, 167, 0.7)',
+                            'rgba(182, 133, 83, 0.7)',
+                            'rgba(166, 115, 60, 0.7)'
+                        ],
+                        borderColor: '#fdfaf6',
+                        borderWidth: 3
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                            labels: {
+                                font: {
+                                    family: "'Noto Sans SC', sans-serif"
+                                }
+                            }
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    return context.label;
+                                }
+                            }
+                        },
+                        title: {
+                            display: true,
+                            text: '“五位一体”社会企业家模型',
+                            font: { size: 16, family: "'Noto Sans SC', sans-serif" },
+                            padding: { top: 10, bottom: 20 }
+                        }
+                    },
+                    onHover: (event, chartElement) => {
+                        if (chartElement.length) {
+                            const index = chartElement[0].index;
+                            const item = data.philosophy[index];
+                            philosophyDetails.innerHTML = `
+                                <div class="text-center p-6 bg-white rounded-lg shadow-md">
+                                    <h3 class="text-xl font-semibold text-[#c79a6b]">${item.title}</h3>
+                                    <p class="mt-2 text-gray-600">${item.description}</p>
+                                </div>
+                            `;
+                        }
+                    }
+                }
+            });
+
+            const fourCoItems = document.querySelectorAll('.four-co-item');
+            const fourCoDetails = document.getElementById('four-co-details');
+            const initialFourCoText = fourCoDetails.innerHTML;
+
+            fourCoItems.forEach(item => {
+                item.addEventListener('mouseover', () => {
+                    const detail = data.fourCo[item.dataset.id];
+                    fourCoDetails.innerHTML = `<strong class="text-[#c79a6b]">${detail.title}</strong>: ${detail.description}`;
+                });
+                item.addEventListener('mouseout', () => {
+                    fourCoDetails.innerHTML = initialFourCoText;
+                });
+            });
+            
+            function createAccordionCard(containerId, items) {
+                const container = document.getElementById(containerId);
+                items.forEach((item, index) => {
+                    const div = document.createElement('div');
+                    div.className = 'card bg-white rounded-lg shadow-md overflow-hidden';
+                    div.innerHTML = `
+                        <div class="p-4 cursor-pointer flex justify-between items-center">
+                            <h4 class="font-semibold text-[#b38553]">${item.title}</h4>
+                            <span class="text-xl text-[#c79a6b]">+</span>
+                        </div>
+                        <div class="px-4 pb-4 text-gray-600 hidden">
+                            <p>${item.content}</p>
+                        </div>
+                    `;
+                    container.appendChild(div);
+
+                    const header = div.querySelector('.p-4');
+                    const content = div.querySelector('.hidden');
+                    const icon = div.querySelector('span');
+                    header.addEventListener('click', () => {
+                        const isVisible = !content.classList.contains('hidden');
+                        content.classList.toggle('hidden');
+                        icon.textContent = isVisible ? '+' : '-';
+                    });
+                });
+            }
+            createAccordionCard('self-generation-cards', data.selfGeneration);
+            createAccordionCard('symbiosis-cards', data.symbiosis);
+            
+            const timelineNav = document.getElementById('timeline-nav');
+            const timelineContent = document.getElementById('timeline-content');
+            data.culture.forEach((item, index) => {
+                const navItem = document.createElement('div');
+                navItem.className = 'timeline-item relative p-4 cursor-pointer';
+                navItem.dataset.id = item.id;
+                navItem.innerHTML = `<h4 class="font-semibold text-lg text-[#b38553]">${item.version}</h4><p class="text-gray-500">${item.title}</p>`;
+                
+                navItem.addEventListener('click', () => {
+                    document.querySelectorAll('.timeline-item').forEach(el => el.classList.remove('active'));
+                    navItem.classList.add('active');
+                    
+                    const content = data.culture.find(c => c.id === item.id);
+                    timelineContent.innerHTML = `
+                        <h3 class="text-2xl font-bold text-[#c79a6b]">${content.version}: ${content.title}</h3>
+                        <p class="mt-4 text-gray-600 leading-relaxed">${content.description}</p>
+                    `;
+                });
+                
+                timelineNav.appendChild(navItem);
+                
+                if (index === 0) {
+                    navItem.click();
+                }
+            });
+        });
+    </script>
+</body>
+</html>
