@@ -2,7 +2,7 @@
 
 这是一个基于刘正山先生所著《横店创之道》一书核心内容创建的单页交互式网页应用。项目旨在通过现代化的前端技术和数据可视化手段，将书中深刻的商业哲学与发展模式，转化为一种直观、易于探索的沉浸式学习体验。
 
-**[查看在线演示 (Live Demo)](横店创之道网页总结.html)** 👈 _请替换为您的 GitHub Pages 链接_
+**[查看在线演示 (Live Demo)](https://liguannan-alex.github.io/The-Way-of-Creation-in-Hengdian/)** 👈 _请替换为您的 GitHub Pages 链接_
 
 ![项目截图](https://placehold.co/800x450/f9f5ef/b38553?text=项目界面截图)
 
